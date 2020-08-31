@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Persongalleri</title>
+
+    <style>
+        h2,
+        h3 {
+            font-family: sans-serif;
+            text-transform: uppercase;
+        }
+
+        p {
+            font-family: monospace;
+            letter-spacing: 1px;
+            font-size: 16px;
+        }
+
+        .banner {
+            display: flex;
+            justify-content: center;
+            background-color: bisque;
+            padding: 20px;
+        }
+
+        section {
+            margin: 10px auto;
+            box-sizing: border-box;
+            display: grid;
+            grid-gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        }
+
+        article {
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 10px;
+
+        }
+
+        article img {
+            width: 100%;
+            height: 328px;
+            object-fit: fill;
+            margin 10px;
+            border-radius: 10px 10px 0px 0px;
+        }
+
+        .info {
+            padding: 2%;
+            background-color: bisque;
+            border-radius: 0px 0px 10px 10px;
+        }
+
+    </style>
+</head>
+
+<header class="banner">
+
+    <h1>Persongalleri</h1>
+
+</header>
+
+<body>
+
+    <div id="knapper">
+        <button class="filter valgt" data-køn="alle">Alle</button>
+        <button class="filter" data-køn="m">Mænd</button>
+        <button class="filter" data-køn="k">Kvinder</button>
+        <button class="filter" data-køn="andet">Andet</button>
+    </div>
+
+
+    <section>
+        <template>
+            <article>
+                <img src="" alt="">
+                <h3 class="navn"></h3>
+                <h2 class="efternavn"></h2>
+                <div class="info">
+                    <p class="kon"></p>
+                    <p class="by"></p>
+                    <p class="land"></p>
+                    <p class="job"></p>
+                    <p class="hobby"></p>
+                </div>
+
+            </article>
+        </template>
+    </section>
+
+    <script>
+        const fil = "dyrIJSON.json";
+        const link = "https://spreadsheets.google.com/feeds/list/1mtHhpoEkYqVqr1TSnKQ1_sQZWI7FRVjcw3H1oatDOVQ/od6/public/values?alt=json";
+        let filter = "k";
+        let personer;
+        addEventlistenersToButtons();
+
+        async function hentdata(fil) {
+            const resultat = await fetch(link);
+            personer = await resultat.json();
+            vis();
+
+        }
+        let temp = document.querySelector("template");
+
+        function vis() {
+            console.log(personer);
+
+
+            let container = document.querySelector("section");
+            //løb igennem array "dyr"
+            container.innerHTML = "";
+            personer.feed.entry.forEach(person => {
+                if (filter == "alle" || filter == person.gsx$køn.$t) {
+
+                    let klon = temp.cloneNode(true).content;
+                    klon.querySelector(".navn").textContent = person.gsx$navn.$t;
+                    klon.querySelector(".efternavn").textContent = person.gsx$efternavn.$t;
+                    klon.querySelector(".by").textContent = person.gsx$by.$t;
+                    klon.querySelector(".land").textContent = person.gsx$land.$t;
+                    klon.querySelector(".hobby").textContent = person.gsx$hobby.$t;
+                    klon.querySelector(".job").textContent = person.gsx$job.$t;
+                    klon.querySelector("img").src = person.gsx$billede.$t
+                    container.appendChild(klon);
+                }
+            })
+        }
+
+        function addEventlistenersToButtons() {
+            document.querySelectorAll(".filter").forEach(btn => {
+                btn.addEventListener("click", filterBTNs);
+            });
+        }
+
+        function filterBTNs() {
+            filter = this.dataset.køn;
+            vis();
+        }
+
+        hentdata(fil);
+
+    </script>
+
+
+
+</body>
+
+</html>
